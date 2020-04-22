@@ -108,24 +108,72 @@ class TripService {
       setTimeout(() => {
         // ici l'exécution du code est asynchrone
         // TODO utiliser resolve et reject en fonction du résultat de la recherche
+        let tripTrouve;
+        for (const trip of this.setTrip ){
+            if (trip.name === tripName){
+                tripTrouve = trip;
+                break;
+            }
+        }
+        if(tripTrouve) {
+            resolve(tripTrouve)
+        } else {
+            reject(`No trip found with name = ${tripName}`)
+        }
+
       }, 2000);
     });
   }
 }
 /**/
 
+const tripServ = new TripService();
+tripServ.findByName('Nantes')
+    .then(tripTrouve => console.log('Trip found ', tripTrouve))
+    .catch(err => console.log(err))
+
+
+
+
 class PriceService {
-  constructor() {
-    this.mapTrip = new Map();
-    this.mapTrip.set("paris", 100);
-    this.mapTrip.set("rio-de-janeiro", 800);
-  }
-  findPriceByTripId(tripId) {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        // ici l'exécution du code est asynchrone
-        // TODO utiliser resolve et reject en fonction du résultat de la recherche
-      }, 2000);
-    });
-  }
+    constructor() {
+        // TODO Map of 2 trips
+        // no price for 'nantes'
+        // 41 • Compléter le constructeur de la classe PriceService pour initialiser une Map (clé == identifiant voyage, valeur == prix). Stocker y 2 prix pour les villes Paris et Rio de Janeiro.
+        this.map = new Map();
+        // 'paris' --> price == 100
+        this.map.set('paris', 100);
+        // 'rio-de-janeiro' --> price == 800)
+        this.map.set('rio-de-janeiro', 800);
+    }
+    findPriceByTripId(tripId) {
+        return new Promise((resolve, reject) => {
+            setTimeout( () => {
+                const price = this.map.get(tripId);
+
+                if(price) {
+                    resolve(price);
+                } else {
+                    reject(`No price found with trip id = ${tripId}`)
+                }
+            }, 2000)
+        });
+    }
 }
+
+const priceServ = new PriceService()
+
+priceServ.findPriceByTripId('paris')
+    .then(price => console.log('Price found', price))
+    .catch(err => console.log(err))
+
+const tripName = 'XXX';
+
+// Name => Trip => Id Trip => Price
+
+tripServ.findByName(tripName)
+    .then(trip => trip.id)
+    .then(tripId => priceServ.findPriceByTripId(tripId)) // flatMap
+    .then(price => console.log('Price found', price))
+    .catch(err => console.log(err))
+
